@@ -15,3 +15,5 @@ use \App\Http\Controllers;
 */
 
 Route::resource('vulnerabilities', Controllers\VulnerabilitiesController::class);
+
+Route::redirect('/', route('vulnerabilities.index'));
