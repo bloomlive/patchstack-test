@@ -42,7 +42,9 @@ class VulnerabilitiesControllerTest extends TestCase
     /** @test */
     public function visitor_can_edit_vulnerability()
     {
-        $response = $this->get(route('vulnerabilities.edit'));
+        $model = Vulnerability::factory()->create();
+
+        $response = $this->get(route('vulnerabilities.edit', $model->id));
 
         $this
             ->assertInstanceOf(Vulnerability::class, $response->viewData('vulnerability'));
