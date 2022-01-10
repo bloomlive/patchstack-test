@@ -89,8 +89,8 @@ class VulnerabilitiesControllerTest extends TestCase
             ->assertSoftDeleted($model);
 
         $response
-            ->assertRedirect(route('vulnerabilities.index'))
-            ->assertViewHas('message', __('vulnerability.deleted'))
+            ->assertOk()
+            ->assertViewHas('success', __('vulnerability.deleted'))
             ->assertViewIs('vulnerabilities.index');
     }
 
@@ -121,7 +121,7 @@ class VulnerabilitiesControllerTest extends TestCase
 
         $response
             ->assertRedirect(route('vulnerabilities.show', json_encode($response->json()->id)))
-            ->assertViewHas('message', __('vulnerability.created'))
+            ->assertViewHas('success', __('vulnerability.created'))
             ->assertViewIs('vulnerabilities.show');
     }
 
@@ -133,5 +133,17 @@ class VulnerabilitiesControllerTest extends TestCase
         $response
             ->assertRedirect(route('vulnerabilities.index'))
             ->assertViewIs('vulnerabilities.index');
+    }
+
+    /** @test */
+    public function deleting_non_existing_vulnerability_throws_error()
+    {
+        $response = $this->delete(route('vulnerabilities.destroy', 1));
+
+        $this->assertDatabaseMissing('vulnerabilities', [
+                'id' => 1,
+            ]);
+
+        $response->assertNotFound();
     }
 }
