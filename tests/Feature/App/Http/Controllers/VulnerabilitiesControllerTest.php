@@ -133,8 +133,7 @@ class VulnerabilitiesControllerTest extends TestCase
         $response = $this->get('/');
 
         $response
-            ->assertRedirect(route('vulnerabilities.index'))
-            ->assertViewIs('vulnerabilities.index');
+            ->assertRedirect(route('vulnerabilities.index'));
     }
 
     /** @test */
