@@ -12,7 +12,7 @@ class VulnerabilitiesController extends Controller
     public function index()
     {
         return view('vulnerabilities.index', [
-            'vulnerabilities' => Vulnerability::query()->paginate(10)
+            'vulnerabilities' => Vulnerability::query()->paginate(12)
         ]);
     }
 
@@ -29,13 +29,14 @@ class VulnerabilitiesController extends Controller
 
         return redirect()
             ->to(route('vulnerabilities.show', $vulnerability->id))
-            ->with('success', __('vulnerability.created'));
+            ->with('success', __('vulnerability.created'))
+            ->withInput();
     }
 
     public function show(Vulnerability $vulnerability)
     {
         return view('vulnerabilities.show', [
-            'vulnerability' => $vulnerability
+            'vulnerability' => $vulnerability->load('vulnerabilityFactors')
         ]);
     }
 
