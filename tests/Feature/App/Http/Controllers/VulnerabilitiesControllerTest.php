@@ -15,7 +15,11 @@ class VulnerabilitiesControllerTest extends TestCase
     {
         $response = $this->get(route('vulnerabilities.index'));
 
-        $response->assertOk();
+        $response->assertViewIs('vulnerabilities.index');
+
+        $response
+            ->assertOk()
+            ->assertViewIs('vulnerabilities.index');
     }
 
     /** @test */
@@ -25,7 +29,9 @@ class VulnerabilitiesControllerTest extends TestCase
 
         $response = $this->get(route('vulnerabilities.show', $model->id));
 
-        $response->assertOk();
+        $response
+            ->assertOk()
+            ->assertViewIs('vulnerabilities.index');
     }
 
     /** @test */
@@ -34,8 +40,8 @@ class VulnerabilitiesControllerTest extends TestCase
         $model = Vulnerability::factory(['title' => 'Old title'])->create();
 
         $this->assertDatabaseHas('vulnerabilities', [
-           'id' => $model->id,
-           'title' => 'Old title'
+            'id'    => $model->id,
+            'title' => 'Old title'
         ]);
 
         $response = $this->put(route('vulnerabilities.update', $model->id), [
@@ -43,11 +49,13 @@ class VulnerabilitiesControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('vulnerabilities', [
-            'id' => $model->id,
+            'id'    => $model->id,
             'title' => 'Old title'
         ]);
 
-        $response->assertRedirectContains(route('vulnerabilities.show', $model->id));
+        $response
+            ->assertRedirectContains(route('vulnerabilities.show', $model->id))
+            ->assertViewIs('vulnerabilities.show');
     }
 
     /** @test */
@@ -59,7 +67,9 @@ class VulnerabilitiesControllerTest extends TestCase
 
         $this->assertSoftDeleted($model);
 
-        $response->assertRedirect(route('vulnerabilities.index'));
+        $response
+            ->assertRedirect(route('vulnerabilities.index'))
+            ->assertViewIs('vulnerabilities.index');
     }
 
     /** @test */
@@ -67,17 +77,19 @@ class VulnerabilitiesControllerTest extends TestCase
     {
         $data = Vulnerability::factory()->raw();
 
-        $this->assertDatabaseMissing('vulnerabilities' ,[
+        $this->assertDatabaseMissing('vulnerabilities', [
             'title' => $data['title']
         ]);
 
         $response = $this->post(route('vulnerabilities.store'), $data);
 
-        $this->assertDatabaseHas('vulnerabilities' ,[
+        $this->assertDatabaseHas('vulnerabilities', [
             'title' => $data['title']
         ]);
 
-        $response->assertRedirect(route('vulnerabilities.show', json_encode($response->json()->id)));
+        $response
+            ->assertRedirect(route('vulnerabilities.show', json_encode($response->json()->id)))
+            ->assertViewIs('vulnerabilities.show');
     }
 
     /** @test */
@@ -85,6 +97,8 @@ class VulnerabilitiesControllerTest extends TestCase
     {
         $response = $this->get('/');
 
-        $response->assertRedirect(route('vulnerabilities.index'));
+        $response
+            ->assertRedirect(route('vulnerabilities.index'))
+            ->assertViewIs('vulnerabilities.index');;
     }
 }
