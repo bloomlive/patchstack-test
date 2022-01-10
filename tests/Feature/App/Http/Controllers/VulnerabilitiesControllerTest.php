@@ -132,6 +132,6 @@ class VulnerabilitiesControllerTest extends TestCase
 
         $response
             ->assertRedirect(route('vulnerabilities.index'))
-            ->assertViewIs('vulnerabilities.index');;
+            ->assertViewIs('vulnerabilities.index');
     }
 }
