@@ -3,11 +3,13 @@
 namespace Tests\Feature\App\Http\Controllers;
 
 use App\Models\Vulnerability;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
 
 class VulnerabilitiesControllerTest extends TestCase
 {
+    use LazilyRefreshDatabase;
 
     /** @test */
     public function visitor_can_see_vulnerabilities_index_with_pagination()
@@ -64,20 +66,22 @@ class VulnerabilitiesControllerTest extends TestCase
             'title' => 'Old title'
         ]);
 
-        $response = $this->put(route('vulnerabilities.update', $model->id), [
-            'title' => 'New title'
-        ]);
+        $response = $this
+            ->followingRedirects()
+            ->from(route('vulnerabilities.edit', $model->id))
+            ->put(route('vulnerabilities.update', $model->id), [
+                'title' => 'New title'
+            ]);
 
         $this
             ->assertDatabaseHas('vulnerabilities', [
                 'id'    => $model->id,
                 'title' => 'Old title'
-            ])
-            ->assertInstanceOf(Vulnerability::class, $response->viewData('vulnerability'));
+            ]);
 
         $response
-            ->assertRedirectContains(route('vulnerabilities.show', $model->id))
-            ->assertViewIs('vulnerabilities.show');
+            ->assertOk()
+            ->assertViewIs('vulnerabilities.edit');
     }
 
     /** @test */
@@ -85,15 +89,15 @@ class VulnerabilitiesControllerTest extends TestCase
     {
         $model = Vulnerability::factory()->create();
 
-        $response = $this->delete(route('vulnerabilities.destroy', $model->id));
+        $response = $this
+            ->from(route('vulnerabilities.index'))
+            ->delete(route('vulnerabilities.destroy', $model->id));
 
         $this
             ->assertSoftDeleted($model);
 
         $response
-            ->assertOk()
-            ->assertViewHas('success', __('vulnerability.deleted'))
-            ->assertViewIs('vulnerabilities.index');
+            ->assertRedirect(route('vulnerabilities.index'));
     }
 
     /** @test */
@@ -111,19 +115,16 @@ class VulnerabilitiesControllerTest extends TestCase
     {
         $data = Vulnerability::factory()->raw();
 
-        $this->assertDatabaseMissing('vulnerabilities', [
-            'title' => $data['title']
-        ]);
-
-        $response = $this->post(route('vulnerabilities.store'), $data);
+        $response = $this
+            ->followingRedirects()
+            ->post(route('vulnerabilities.store'), $data);
 
         $this->assertDatabaseHas('vulnerabilities', [
             'title' => $data['title']
         ]);
 
         $response
-            ->assertRedirect(route('vulnerabilities.show', json_encode($response->json()->id)))
-            ->assertViewHas('success', __('vulnerability.created'))
+            ->assertOk()
             ->assertViewIs('vulnerabilities.show');
     }
 
