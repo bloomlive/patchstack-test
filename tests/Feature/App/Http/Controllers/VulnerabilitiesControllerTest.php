@@ -14,7 +14,7 @@ class VulnerabilitiesControllerTest extends TestCase
     /** @test */
     public function visitor_can_see_vulnerabilities_index_with_pagination()
     {
-        Vulnerability::factory()->count(24)->create();
+        Vulnerability::factory()->count(26)->create();
 
         $response = $this->get(route('vulnerabilities.index'));
 

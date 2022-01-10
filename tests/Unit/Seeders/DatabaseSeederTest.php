@@ -15,8 +15,8 @@ class DatabaseSeederTest extends TestCase
     {
         (new DatabaseSeeder)->run();
 
-        $this->assertDatabaseCount('vulnerabilities', 24)
-            ->assertDatabaseCount('vulnerability_factor_types', 8)
-            ->assertDatabaseCount('vulnerability_factors', 192);
+        $this->assertDatabaseCount('vulnerabilities', 26)
+            ->assertDatabaseCount('vulnerability_factor_types', 9)
+            ->assertDatabaseCount('vulnerability_factors', 234);
     }
 }
