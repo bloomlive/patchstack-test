@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\VulnerabilityStoreRequest;
+use App\Http\Requests\VulnerabilityUpdateRequest;
 use App\Models\Vulnerability;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class VulnerabilitiesController extends Controller
 {
@@ -19,9 +21,15 @@ class VulnerabilitiesController extends Controller
         return view('vulnerabilities.create');
     }
 
-    public function store(Request $request)
+    public function store(VulnerabilityStoreRequest $request): RedirectResponse
     {
-        //
+        $validated = $request->validated();
+
+        $vulnerability = Vulnerability::query()->create($validated);
+
+        return redirect()
+            ->to(route('vulnerabilities.show', $vulnerability->id))
+            ->with('success', __('vulnerability.created'));
     }
 
     public function show(Vulnerability $vulnerability)
@@ -38,17 +46,25 @@ class VulnerabilitiesController extends Controller
         ]);
     }
 
-    public function update(Request $request, Vulnerability $vulnerability)
+    public function update(VulnerabilityUpdateRequest $request, Vulnerability $vulnerability)
     {
-        //
+        $validated = $request->validated();
+
+        $vulnerability->fill($validated)->save();
+
+        return redirect()
+            ->back()
+            ->with('success', __('vulnerability.created'));
     }
 
-    public function destroy(Vulnerability $vulnerability)
+    public function destroy(Vulnerability $vulnerability): RedirectResponse
     {
-        if (!$vulnerability->delete()) {
-            return back()->with('error', __('vulnerability.delete.failed'));
+        $delete = $vulnerability->delete();
+
+        if (!$delete) {
+            return back()->with('message', __('vulnerability.delete.failed'));
         };
 
-        return $this->index()->with('success', __('vulnerability.deleted'));
+        return back()->with('success', __('vulnerability.deleted'));
     }
 }
