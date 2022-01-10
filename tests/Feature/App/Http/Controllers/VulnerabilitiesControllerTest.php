@@ -143,8 +143,8 @@ class VulnerabilitiesControllerTest extends TestCase
         $response = $this->delete(route('vulnerabilities.destroy', 1));
 
         $this->assertDatabaseMissing('vulnerabilities', [
-                'id' => 1,
-            ]);
+            'id' => 1,
+        ]);
 
         $response->assertNotFound();
     }
