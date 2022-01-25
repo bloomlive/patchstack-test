@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media (min-width: 1024px) {
+    .lg\:w-1\/8 {
+        width: 12.5% !important;
+    }
+}

@@ -3,6 +3,8 @@
 namespace Tests\Feature\App\Http\Controllers;
 
 use App\Models\Vulnerability;
+use App\Models\VulnerabilityFactor;
+use App\Models\VulnerabilityFactorType;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
@@ -114,6 +116,14 @@ class VulnerabilitiesControllerTest extends TestCase
     public function visitor_can_store_vulnerability()
     {
         $data = Vulnerability::factory()->raw();
+
+        $values = [];
+
+        VulnerabilityFactorType::all()->each(function($type) use (&$values) {
+           $values[$type->id] = VulnerabilityFactor::factory()->raw()['value'];
+        });
+
+        $data['vulnerability_type_value'] = $values;
 
         $response = $this
             ->followingRedirects()

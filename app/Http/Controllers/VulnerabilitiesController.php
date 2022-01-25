@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\VulnerabilityStoreRequest;
-use App\Http\Requests\VulnerabilityUpdateRequest;
 use App\Models\Vulnerability;
+use App\Models\VulnerabilityFactorType;
 use Illuminate\Http\RedirectResponse;
 
 class VulnerabilitiesController extends Controller
@@ -18,14 +18,25 @@ class VulnerabilitiesController extends Controller
 
     public function create()
     {
-        return view('vulnerabilities.create');
+        return view('vulnerabilities.create', [
+            'vulnerabilityFactorTypes' => VulnerabilityFactorType::all()
+        ]);
     }
 
     public function store(VulnerabilityStoreRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
+        $validated = $request->except('vulnerability_type_value');
 
         $vulnerability = Vulnerability::query()->create($validated);
+
+        $vulnerabilityFactors = $request->only('vulnerability_type_value')['vulnerability_type_value'];
+
+        foreach ($vulnerabilityFactors as $id => $value) {
+            $vulnerability->vulnerabilityFactors()->create([
+                'value'                        => $value,
+                'vulnerability_factor_type_id' => $id
+            ]);
+        }
 
         return redirect()
             ->to(route('vulnerabilities.show', $vulnerability->id))
@@ -36,26 +47,38 @@ class VulnerabilitiesController extends Controller
     public function show(Vulnerability $vulnerability)
     {
         return view('vulnerabilities.show', [
-            'vulnerability' => $vulnerability->load('vulnerabilityFactors')
+            'vulnerability' => $vulnerability->load('vulnerabilityFactors'),
         ]);
     }
 
     public function edit(Vulnerability $vulnerability)
     {
         return view('vulnerabilities.edit', [
-            'vulnerability' => $vulnerability
+            'vulnerability' => $vulnerability->load('vulnerabilityFactors'),
         ]);
     }
 
-    public function update(VulnerabilityUpdateRequest $request, Vulnerability $vulnerability)
+    public function update(VulnerabilityStoreRequest $request, Vulnerability $vulnerability)
     {
-        $validated = $request->validated();
+        $validated = $request->except('vulnerability_type_value');
+        $vulnerabilityFactors = $request->only('vulnerability_type_value')['vulnerability_type_value'];
 
-        $vulnerability->fill($validated)->save();
+        \DB::transaction(function () use ($vulnerability, $validated, $vulnerabilityFactors) {
+            $vulnerability->vulnerabilityFactors()->delete();
+
+            foreach ($vulnerabilityFactors as $id => $value) {
+                $vulnerability->vulnerabilityFactors()->create([
+                    'value'                        => $value,
+                    'vulnerability_factor_type_id' => $id
+                ]);
+            }
+
+            $vulnerability->fill($validated)->save();
+        });
 
         return redirect()
             ->back()
-            ->with('success', __('vulnerability.created'));
+            ->with('success', __('vulnerability.updated'));
     }
 
     public function destroy(Vulnerability $vulnerability): RedirectResponse
