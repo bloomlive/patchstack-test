@@ -119,8 +119,8 @@ class VulnerabilitiesControllerTest extends TestCase
 
         $values = [];
 
-        VulnerabilityFactorType::all()->each(function($type) use (&$values) {
-           $values[$type->id] = VulnerabilityFactor::factory()->raw()['value'];
+        VulnerabilityFactorType::all()->each(function ($type) use (&$values) {
+            $values[$type->id] = VulnerabilityFactor::factory()->raw()['value'];
         });
 
         $data['vulnerability_type_value'] = $values;

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\VulnerabilityStoreRequest;
 use App\Models\Vulnerability;
 use App\Models\VulnerabilityFactorType;
@@ -63,7 +64,7 @@ class VulnerabilitiesController extends Controller
         $validated = $request->except('vulnerability_type_value');
         $vulnerabilityFactors = $request->only('vulnerability_type_value')['vulnerability_type_value'];
 
-        \DB::transaction(function () use ($vulnerability, $validated, $vulnerabilityFactors) {
+        DB::transaction(function () use ($vulnerability, $validated, $vulnerabilityFactors) {
             $vulnerability->vulnerabilityFactors()->delete();
 
             foreach ($vulnerabilityFactors as $id => $value) {
