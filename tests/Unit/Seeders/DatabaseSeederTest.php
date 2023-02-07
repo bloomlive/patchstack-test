@@ -13,7 +13,7 @@ class DatabaseSeederTest extends TestCase
     /** @test */
     public function it_seeds_expected_data()
     {
-        (new DatabaseSeeder)->run();
+        (new DatabaseSeeder())->run();
 
         $this->assertDatabaseCount('vulnerabilities', 26)
             ->assertDatabaseCount('vulnerability_factor_types', 9)
